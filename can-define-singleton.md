@@ -31,7 +31,7 @@ Once you have decorated your class, the class will have two new static propertie
 - **`MyType.current`** - the current value for the singleton
 - **`MyType.currentPromise`** - the promise which should resolve to the value for the singleton
 
-The first time you read either of these properties, the value will be loaded by calling the `get` method on your constructor. The `get` method should return a promise, which will be stored on the `MyType.currentPromise` property:
+The first time you read either of these properties, the value will be loaded by calling the static `get` method on your class. The `get` method should return a Promise, which will be stored on the static `currentPromise` property of your class:
 
 ```js
 @singleton
@@ -80,4 +80,4 @@ const MyType = singleton( options )(
 );
 ```
 
-Using the above options, you class would be decorated with `foo` and `fooPromise` properties instead of `current` and `currentPromise`, respectively. Furthermore, the `doFoo` method will be invoked instead of the `get` method.
+Using the above options, your class would be decorated with `foo` and `fooPromise` properties instead of `current` and `currentPromise`, respectively. Furthermore, the `doFoo` method will be invoked instead of the `get` method for loading the singleton data.
