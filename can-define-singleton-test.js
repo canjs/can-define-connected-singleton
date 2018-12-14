@@ -72,7 +72,7 @@ QUnit.test('Allows for configurable data method name', function(assert){
 	});
 });
 
-QUnit.test('Creating/saving a new instance updates the "current" property', function(assert){
+QUnit.skip('Creating/saving a new instance updates the "current" property', function(assert){
 	assert.expect(2);
 	const done = assert.async();
 	const MyType = singleton(
