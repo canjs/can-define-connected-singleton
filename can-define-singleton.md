@@ -26,12 +26,12 @@ const MyType = singleton(
 
 ## How does it work
 
-Once you have decorated DefineMap constructor, your class will have two new static properties:
+Once you have decorated your class, the class will have two new static properties:
 
 - **`MyType.current`** - the current value for the singleton
 - **`MyType.currentPromise`** - the promise which should resolve to the value for the singleton
 
-The first time you read the value of `MyType.current`, the value will be loaded by calling the `get` method on your constructor. The `get` method should return a promise, which will be stored on the `MyType.currentPromise` property:
+The first time you read either of these properties, the value will be loaded by calling the `get` method on your constructor. The `get` method should return a promise, which will be stored on the `MyType.currentPromise` property:
 
 ```js
 @singleton
@@ -58,7 +58,7 @@ By default, the singleton decorator uses the following options:
 ```js
 {
   propertyName: 'current',
-  getMethodName: 'get'
+  dataMethodName: 'get'
 }
 ```
 
@@ -67,7 +67,7 @@ You can specify your own options using the following syntax:
 ```js
 const options = {
   propertyName: 'foo',
-  getMethodName: 'doFoo'
+  dataMethodName: 'doFoo'
 };
 
 // as a decorator

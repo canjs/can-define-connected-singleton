@@ -63,7 +63,7 @@ QUnit.test('Allows for configurable "get" method name', function(assert){
 		return Promise.resolve('the value!');
 	};
 
-	const Decorated = plugin({ getMethodName: 'doFooBar' })(MyType);
+	const Decorated = plugin({ dataMethodName: 'doFooBar' })(MyType);
 
 	QUnit.equal(Decorated.current, undefined, 'initially undefined');
 	Decorated.currentPromise.then(() => {

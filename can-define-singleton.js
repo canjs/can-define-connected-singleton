@@ -8,14 +8,14 @@ var zoneStorage = require('./storage/zone-storage');
 var defaults = {
 	storagePrefix: 'can-define-singleton',
 	propertyName: 'current',
-	getMethodName: 'get'
+	dataMethodName: 'get'
 };
 
 function isDefineMapConstructor(Obj) {
 	return Obj && Obj.prototype instanceof DefineMap;
 }
 
-function makeSingleton(Ctor, { storagePrefix, propertyName, getMethodName }){
+function makeSingleton(Ctor, { storagePrefix, propertyName, dataMethodName }){
 	var helpURL = 'https://canjs.com/doc/can-define-singleton';
 
 	if(!isDefineMapConstructor(Ctor)) {
@@ -38,7 +38,7 @@ function makeSingleton(Ctor, { storagePrefix, propertyName, getMethodName }){
 		var promise = zoneStorage.getItem(storageKeyPromise);
 		
 		if(promise === undefined) {
-			promise = Ctor[getMethodName]();
+			promise = Ctor[ dataMethodName ]();
 			zoneStorage.setItem(storageKeyPromise, promise);
 
 			promise.then(function (value) {
