@@ -72,19 +72,47 @@ QUnit.test('Allows for configurable data method name', function(assert){
 	});
 });
 
-QUnit.skip('Creating/saving a new instance updates the "current" property', function(assert){
-	assert.expect(2);
+QUnit.test('Creating/saving a new instance updates the "current" property', function(assert){
+	assert.expect(3);
 	const done = assert.async();
 	const MyType = singleton(
-		DefineMap.extend({})
+		DefineMap.extend({ 
+			get: () => Promise.resolve()
+		}, {})
 	);
 
 	const instance = new MyType();
-	MyType.dispatch('created', [null, instance]);
-	QUnit.equal(instance, MyType.current);
+	QUnit.notEqual(MyType.current, instance);
+	
+	MyType.dispatch('created', [instance]);
+	QUnit.equal(MyType.current, instance);
 
 	MyType.currentPromise.then(value => {
 		QUnit.equal(value, instance);
+		done();
+	});
+});
+
+QUnit.test('Destroying sets the "current" property to undefined, with rejected promise', function(assert){
+	assert.expect(2);
+	const done = assert.async();
+	const MyType = singleton(
+		DefineMap.extend({ 
+			get: () => Promise.resolve()
+		}, {})
+	);
+
+	const instance = new MyType();
+	
+	MyType.dispatch('created', [instance]);
+	MyType.dispatch('destroyed', [instance]);
+	QUnit.equal(MyType.current, undefined);
+
+	MyType.currentPromise.then(() => {
+		QUnit.notOk(true, 'should not get here');
+		done();
+	}).catch(value => {
+		QUnit.equal(value, undefined);
 		done();
 	});
 });
