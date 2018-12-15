@@ -3,7 +3,8 @@
 var DefineMap = require('can-define/map/map');
 var DefineList = require('can-define/list/list');
 var ObservationRecorder = require('can-observation-recorder');
-var zoneStorage = require('./storage/zone-storage');
+var zoneStorage = require('./util/zone-storage');
+var helpers = require('./util/helpers');
 
 var defaults = {
 	storagePrefix: 'can-define-singleton',
@@ -110,7 +111,7 @@ function makeSingleton(Ctor, { storagePrefix, propertyName, dataMethodName }){
 }
 
 function singleton(Obj) {
-	var opts = Object.assign({}, defaults);
+	var opts = helpers.assign({}, defaults);
 
 	// @singleton
 	if(isDefineMapConstructor(Obj)) {
@@ -119,7 +120,7 @@ function singleton(Obj) {
 
 	// @singleton(options)
 	return function(Ctor) {
-		return makeSingleton(Ctor, Object.assign(opts, Obj));
+		return makeSingleton(Ctor, helpers.assign(opts, Obj));
 	};
 }
 
