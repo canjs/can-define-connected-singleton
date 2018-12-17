@@ -1,6 +1,6 @@
 {
   "name": "can-define-singleton",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Singleton plugin for can-define",
   "homepage": "https://canjs.com",
   "repository": {
