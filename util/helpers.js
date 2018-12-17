@@ -1,5 +1,5 @@
-const assign = function(obj) {
-	const to = Object(obj);
+var assign = function(obj) {
+	var to = Object(obj);
 
 	for (var i = 1, l = arguments.length; i < l ; i++) {
 		var next = arguments[i];
@@ -18,5 +18,5 @@ const assign = function(obj) {
 
 
 module.exports = {
-	assign
+	assign: assign
 };

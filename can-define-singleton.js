@@ -1,5 +1,6 @@
 'use strict';
 
+
 var DefineMap = require('can-define/map/map');
 var DefineList = require('can-define/list/list');
 var ObservationRecorder = require('can-observation-recorder');
@@ -13,18 +14,19 @@ var defaults = {
 };
 
 function isDefineMapConstructor(Obj) {
-	return Obj && Obj.prototype instanceof DefineMap;
+	return Obj && (Obj.prototype instanceof DefineMap);
 }
 
-function makeSingleton(Ctor, { storagePrefix, propertyName, dataMethodName }){
+function makeSingleton(Ctor, options){
 	var helpURL = 'https://canjs.com/doc/can-define-singleton';
 
 	if(!isDefineMapConstructor(Ctor)) {
 		throw new Error('The singleton decorator/mixin can only be used for DefineMaps: ' + helpURL);
 	}
 
+	var propertyName = options.propertyName;
 	var propertyNamePromise = propertyName + 'Promise';
-	var storageKey = storagePrefix + '-' + Ctor.name + '-' + propertyName;
+	var storageKey = options.storagePrefix + '-' + Ctor.name + '-' + propertyName;
 	var storageKeyPromise = storageKey + '-promise';
 
 	if(zoneStorage.getItem(storageKey) || zoneStorage.getItem(storageKeyPromise)){
@@ -38,8 +40,8 @@ function makeSingleton(Ctor, { storagePrefix, propertyName, dataMethodName }){
 		var current = zoneStorage.getItem(storageKey);
 		var promise = zoneStorage.getItem(storageKeyPromise);
 		
-		if(promise === undefined) {
-			promise = Ctor[ dataMethodName ]();
+		if(promise == null 	) {
+			promise = Ctor[ options.dataMethodName ]();
 			zoneStorage.setItem(storageKeyPromise, promise);
 
 			promise.then(function (value) {
@@ -101,6 +103,7 @@ function makeSingleton(Ctor, { storagePrefix, propertyName, dataMethodName }){
 
 	// This can be removed whenever can-connect allows
 	// types to not have a List definition.
+	// https://github.com/canjs/can-connect/issues/446
 	if(!Ctor.List) {
 		Ctor.List = DefineList.extend({
 			'#': Ctor
