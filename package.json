@@ -5,7 +5,7 @@
   "homepage": "https://canjs.com",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Bitovi/can-define-singleton.git"
+    "url": "git://github.com/canjs/can-define-singleton.git"
   },
   "author": {
     "name": "Bitovi",

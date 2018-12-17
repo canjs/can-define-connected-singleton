@@ -8,33 +8,33 @@ QUnit.test('Works as a simple class @decorator', function(){
 	const MyType = DefineMap.extend({});
 	const Decorated = singleton(MyType);
 
-	QUnit.ok(MyType === Decorated);
-	QUnit.equal(Decorated.hasOwnProperty('current'), true);
-	QUnit.equal(Decorated.hasOwnProperty('currentPromise'), true);
+	QUnit.equal(MyType, Decorated);
+	QUnit.ok(Decorated.hasOwnProperty('current'));
+	QUnit.ok(Decorated.hasOwnProperty('currentPromise'));
 });
 
 QUnit.test('Works as a @decorator({ with_options })', function(){
 	const MyType = DefineMap.extend({});
 	const factory = singleton({});
-	QUnit.ok(MyType !== factory);
-
 	const Decorated = factory(MyType);
-	QUnit.ok(MyType === Decorated);
-	QUnit.equal(Decorated.hasOwnProperty('current'), true);
-	QUnit.equal(Decorated.hasOwnProperty('currentPromise'), true);
+
+	QUnit.equal(MyType, Decorated);
+	QUnit.ok(Decorated.hasOwnProperty('current'));
+	QUnit.ok(Decorated.hasOwnProperty('currentPromise'));
 });
 
 QUnit.test('Allows configurable property name', function(){
 	const MyType = DefineMap.extend({});
 	const Decorated = singleton({ propertyName: 'foo' })(MyType);
 
-	QUnit.equal(Decorated.hasOwnProperty('foo'), true);
-	QUnit.equal(Decorated.hasOwnProperty('fooPromise'), true);
-	QUnit.equal(Decorated.hasOwnProperty('current'), false);
-	QUnit.equal(Decorated.hasOwnProperty('currentPromise'), false);
+	QUnit.ok(Decorated.hasOwnProperty('foo'));
+	QUnit.ok(Decorated.hasOwnProperty('fooPromise'));
+	QUnit.notOk(Decorated.hasOwnProperty('current'));
+	QUnit.notOk(Decorated.hasOwnProperty('currentPromise'));
 });
 
 QUnit.test('Calling "current" makes call to Type.get()', function(assert){
+	// ensure that get() is only called once
 	assert.expect(3);
 	const done = assert.async();
 	const MyType = DefineMap.extend({});
@@ -48,7 +48,7 @@ QUnit.test('Calling "current" makes call to Type.get()', function(assert){
 
 	QUnit.equal(Decorated.current, undefined, 'initially undefined');
 	Decorated.currentPromise.then(() => {
-		QUnit.equal(Decorated.current, 'the value!', 'has a value');
+		QUnit.equal(Decorated.current, 'the value!', 'has the expected value');
 		done();
 	});
 });
@@ -67,7 +67,7 @@ QUnit.test('Allows for configurable data method name', function(assert){
 
 	QUnit.equal(Decorated.current, undefined, 'initially undefined');
 	Decorated.currentPromise.then(() => {
-		QUnit.equal(Decorated.current, 'the value!', 'has a value');
+		QUnit.equal(Decorated.current, 'the value!', 'has the expected value');
 		done();
 	});
 });
