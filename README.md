@@ -1,32 +1,22 @@
 # can-define-singleton
 
-[![Build Status](https://travis-ci.org/Bitovi/can-define-singleton.svg?branch=master)](https://travis-ci.org/Bitovi/can-define-singleton)
+[![Join our Slack](https://img.shields.io/badge/slack-join%20chat-611f69.svg)](https://www.bitovi.com/community/slack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join our Discourse](https://img.shields.io/discourse/https/forums.bitovi.com/posts.svg)](https://forums.bitovi.com/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-define-singleton/blob/master/LICENSE)
+[![npm version](https://badge.fury.io/js/can-define-singleton.svg)](https://www.npmjs.com/package/can-define-singleton)
+[![Travis build status](https://travis-ci.org/canjs/can-define-singleton.svg?branch=master)](https://travis-ci.org/canjs/can-define-singleton)
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-define-singleton.svg)](https://greenkeeper.io/)
 
 Singleton plugin for can-define
 
-## Usage
+## Changelog
 
-### ES6 use
+See the [latest releases on GitHub](https://github.com/canjs/can-define-singleton/releases).
 
-With StealJS, you can import this module directly in a template that is autorendered:
+## Contributing
 
-```js
-import plugin from 'can-define-singleton';
-```
+The [contribution guide](https://github.com/canjs/can-define-singleton/blob/master/CONTRIBUTING.md) has information on getting help, reporting bugs, developing locally, and more.
 
-### CommonJS use
+## License
 
-Use `require` to load `can-define-singleton` and everything else
-needed to create a template that uses `can-define-singleton`:
-
-```js
-var plugin = require("can-define-singleton");
-```
-
-### Standalone use
-
-Load the `global` version of the plugin:
-
-```html
-<script src='./node_modules/can-define-singleton/dist/global/can-define-singleton.js'></script>
-```
+[MIT](https://github.com/canjs/can-define-singleton/blob/master/LICENSE)
