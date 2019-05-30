@@ -101,15 +101,6 @@ function makeSingleton(Ctor, options){
 		Ctor.dispatch(propertyNamePromise, [undefined, value]);
 	});
 
-	// This can be removed whenever can-connect allows
-	// types to not have a List definition.
-	// https://github.com/canjs/can-connect/issues/446
-	if(!Ctor.List) {
-		Ctor.List = DefineList.extend({
-			'#': Ctor
-		});
-	}
-
 	return Ctor;
 }
 
