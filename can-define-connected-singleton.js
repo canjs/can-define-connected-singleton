@@ -143,6 +143,13 @@ function makeSingleton(Ctor, input_options){
 		}
 	});
 
+	Object.defineProperty(Ctor, options.savingPropertyName, {
+		get: function () {
+			ObservationRecorder.add(Ctor, options.savingPropertyName);
+			return zoneStorage.getItem(options.storageKeys.savingProperty);
+		}
+	});
+
 	wrapCreateMethod(Ctor, options);
 	wrapDestroyMethod(Ctor, options);
 

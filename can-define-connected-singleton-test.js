@@ -25,10 +25,11 @@ QUnit.test('Works as a @decorator({ with_options })', function(){
 	QUnit.ok(Decorated.hasOwnProperty('currentPromise'));
 });
 
-QUnit.test('Allows configurable property name', function(){
+QUnit.test('Allows configurable property names', function(){
 	var MyType = DefineMap.extend({});
-	var Decorated = singleton({ currentPropertyName: 'foo' })(MyType);
+	var Decorated = singleton({ currentPropertyName: 'foo', savingPropertyName: 'bar' })(MyType);
 
+	QUnit.ok(Decorated.hasOwnProperty('bar'));
 	QUnit.ok(Decorated.hasOwnProperty('foo'));
 	QUnit.ok(Decorated.hasOwnProperty('fooPromise'));
 	QUnit.notOk(Decorated.hasOwnProperty('current'));
@@ -74,10 +75,8 @@ QUnit.test('Allows for configurable data method name', function(assert){
 	});
 });
 
-// TODO: test configurable saving param, saving method & destroy method
-
-QUnit.test('Saving a new instance updates the "current" property', function(assert){
-	assert.expect(4);
+QUnit.test('Saving a new instance updates the "current" and "saving" properties', function(assert){
+	assert.expect(6);
 	var done = assert.async();
 	var MyType = singleton(
 		DefineMap.extend({ 
@@ -87,6 +86,40 @@ QUnit.test('Saving a new instance updates the "current" property', function(asse
 			},
 		}, {
 			save: function() {
+				return new Promise((resolve) => {
+					setTimeout(() => resolve(this), 100);
+				});
+			}
+		})
+	);
+
+	var instance = new MyType();
+	QUnit.notEqual(MyType.current, instance);
+	var promise = instance.save();
+	QUnit.equal(MyType.saving, instance);
+
+	promise.then(() => {
+		QUnit.equal(MyType.current, instance);
+		QUnit.notEqual(MyType.saving, instance);
+
+		MyType.currentPromise.then(function(value) {
+			QUnit.equal(value, instance);
+			done();
+		});
+	});
+});
+
+QUnit.test('Allows for configurable save method name', function(assert){
+	assert.expect(4);
+	var done = assert.async();
+	var MyType = singleton({ createMethodName: 'doFooBar' })(
+		DefineMap.extend({
+			get: function() {
+				assert.ok(true, 'Get called but returns undefined. Should only happen once during this test.');
+				return Promise.resolve(undefined);
+			},
+		}, {
+			doFooBar: function() {
 				return Promise.resolve(this);
 			}
 		})
@@ -95,7 +128,7 @@ QUnit.test('Saving a new instance updates the "current" property', function(asse
 	var instance = new MyType();
 	QUnit.notEqual(MyType.current, instance);
 
-	instance.save().then(() => {
+	instance.doFooBar().then(() => {
 		QUnit.equal(MyType.current, instance);
 
 		MyType.currentPromise.then(function(value) {
@@ -127,6 +160,41 @@ QUnit.test('Destroying sets the "current" property to undefined, with rejected p
 	
 	instance.save().then(() => {
 		instance.destroy().then(() => {
+			QUnit.equal(MyType.current, undefined);
+
+			MyType.currentPromise.then(function() {
+				QUnit.notOk(true, 'should not get here');
+				done();
+			}).catch(function(value) {
+				QUnit.equal(value, 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.');
+				done();
+			});
+		});
+	});
+});
+
+QUnit.test('Allows for configurable destroy method name', function(assert){
+	assert.expect(2);
+	var done = assert.async();
+	var MyType = singleton({ destroyMethodName: 'doFooBar' })(
+		DefineMap.extend({
+			get: function() {
+				return Promise.resolve();
+			}
+		}, {
+			save: function() {
+				return Promise.resolve(this);
+			},
+			doFooBar: function() {
+				return Promise.resolve();
+			}
+		})
+	);
+
+	var instance = new MyType();
+
+	instance.save().then(() => {
+		instance.doFooBar().then(() => {
 			QUnit.equal(MyType.current, undefined);
 
 			MyType.currentPromise.then(function() {
