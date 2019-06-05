@@ -37,7 +37,7 @@ function wrapCreateMethod(Ctor, options) {
 			zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
 			Ctor.dispatch(options.savingPropertyName, [undefined]);
 			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
-			Ctor.dispatch(options.savingPropertyName, [instance]);
+			Ctor.dispatch(options.currentPropertyName, [instance]);
 		}).catch(() => {
 			// clear saving
 			zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
