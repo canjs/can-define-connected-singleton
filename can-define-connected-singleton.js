@@ -1,6 +1,7 @@
 'use strict';
 
 
+var reflect = require('can-reflect');
 var DefineMap = require('can-define/map/map');
 var ObservationRecorder = require('can-observation-recorder');
 var zoneStorage = require('./util/zone-storage');
@@ -15,13 +16,15 @@ var defaults = {
 	destroyMethodName: 'destroy',
 };
 
+var deletedSingletonMessage = 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.';
+
 function isDefineMapConstructor(Obj) {
 	return Obj && (Obj.prototype instanceof DefineMap);
 }
 
 // wrap the createMethod so it updates .current, .currentPromise & .saving during the course of a singleton model being persisted
 function wrapCreateMethod(Ctor, options) {
-	const baseCreate = Ctor.prototype[options.createMethodName];
+	var baseCreate = Ctor.prototype[options.createMethodName];
 
 	Ctor.prototype[options.createMethodName] = function wrappedCreate() {
 		var ret = baseCreate.apply(this, arguments);
@@ -50,13 +53,13 @@ function wrapCreateMethod(Ctor, options) {
 
 // wrap the destroyMethod so it updates .current & .currentPromise during the course of a singleton model being removed from persistence
 function wrapDestroyMethod(Ctor, options) {
-	const baseDestroy = Ctor.prototype[options.destroyMethodName];
+	var baseDestroy = Ctor.prototype[options.destroyMethodName];
 
 	Ctor.prototype[options.destroyMethodName] = function wrappedDestroy() {
 		var ret = baseDestroy.apply(this, arguments);
 
 		ret.then(() => {
-			var promise = Promise.reject('Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.');
+			var promise = Promise.reject(deletedSingletonMessage);
 
 			// clear current, reject currentPromise w/ reason string if successful
 			zoneStorage.setItem(options.storageKeys.currentProperty, undefined);
@@ -140,6 +143,21 @@ function makeSingleton(Ctor, input_options){
 		get: function () {
 			ObservationRecorder.add(Ctor, options.currentPropertyName);
 			return getCurrentAndPromise(Ctor, options).current;
+		},
+		// The "current" property is not typically set via this setter, typically it will be set by the destroyMethod & createMethod wrappers, and getCurrentAndPromise. This setter is used when a user of this module wishes to force a state.
+		set: function(instance) {
+			if (!(instance instanceof Ctor) && instance !== undefined) {
+				throw new TypeError('Attempted to set singleton to an unexpected type. Expected an instance of the constructor "' + reflect.getName(Ctor) + '"');
+			}
+
+			let promise = instance ?
+				Promise.resolve(instance) :
+				Promise.reject(deletedSingletonMessage);
+
+			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
+			Ctor.dispatch(options.currentPropertyName, [instance]);
+			zoneStorage.setItem(options.storageKeys.currentPropertyPromise, promise);
+			Ctor.dispatch(options.currentPropertyPromiseName, [promise]);
 		}
 	});
 

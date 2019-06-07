@@ -6,6 +6,8 @@ var singleton = require('./can-define-connected-singleton');
 
 QUnit.module('can-define-connected-singleton');
 
+const deletedSingletonMessage = 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.';
+
 QUnit.test('Works as a simple class @decorator', function(){
 	var MyType = DefineMap.extend({});
 	var Decorated = singleton(MyType);
@@ -201,9 +203,36 @@ QUnit.test('Allows for configurable destroy method name', function(assert){
 				QUnit.notOk(true, 'should not get here');
 				done();
 			}).catch(function(value) {
-				QUnit.equal(value, 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.');
+				QUnit.equal(value, deletedSingletonMessage);
 				done();
 			});
 		});
 	});
 });
+
+QUnit.test('Setting .current manually results in expected state.', function(assert){
+	assert.expect(4);
+	var done = assert.async();
+	var MyType = singleton(
+		DefineMap.extend({
+			get: function() {
+				assert.ok(false, 'fetch method should never be run while setting .current manually.');
+				return Promise.resolve();
+			}
+		})
+	);
+
+	var instance = new MyType();
+	var promises = [];
+
+	MyType.current = instance;
+	assert.equal(MyType.current, instance);
+	promises.push(MyType.currentPromise.then((ins) => assert.equal(ins, instance)));
+
+	MyType.current = undefined;
+	assert.equal(MyType.current, undefined);
+	promises.push(MyType.currentPromise.catch((msg) => assert.equal(msg, deletedSingletonMessage)));
+
+	Promise.all(promises).then(() => done());
+});
+
