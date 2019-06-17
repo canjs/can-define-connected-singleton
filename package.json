@@ -1,11 +1,11 @@
 {
-  "name": "can-define-singleton",
+  "name": "can-define-connected-singleton",
   "version": "0.1.2",
-  "description": "Singleton plugin for can-define",
+  "description": "Server persisted singleton plugin for can-define",
   "homepage": "https://canjs.com",
   "repository": {
     "type": "git",
-    "url": "git://github.com/canjs/can-define-singleton.git"
+    "url": "git://github.com/canjs/can-define-connected-singleton.git"
   },
   "author": {
     "name": "Bitovi",
@@ -23,7 +23,7 @@
     "release:major": "npm version major && npm publish",
     "develop": "done-serve --static --develop --port 8080"
   },
-  "main": "can-define-singleton",
+  "main": "can-define-connected-singleton",
   "keywords": [
     "",
     "donejs-plugin"
