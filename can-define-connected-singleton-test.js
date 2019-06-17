@@ -6,8 +6,6 @@ var singleton = require('./can-define-connected-singleton');
 
 QUnit.module('can-define-connected-singleton');
 
-const deletedSingletonMessage = 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.';
-
 QUnit.test('Works as a simple class @decorator', function(){
 	var MyType = DefineMap.extend({});
 	var Decorated = singleton(MyType);
@@ -168,7 +166,7 @@ QUnit.test('Destroying sets the "current" property to undefined, with rejected p
 				QUnit.notOk(true, 'should not get here');
 				done();
 			}).catch(function(value) {
-				QUnit.equal(value, 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.');
+				QUnit.equal(value, undefined);
 				done();
 			});
 		});
@@ -203,7 +201,7 @@ QUnit.test('Allows for configurable destroy method name', function(assert){
 				QUnit.notOk(true, 'should not get here');
 				done();
 			}).catch(function(value) {
-				QUnit.equal(value, deletedSingletonMessage);
+				QUnit.equal(value, undefined);
 				done();
 			});
 		});
@@ -231,7 +229,7 @@ QUnit.test('Setting .current manually results in expected state.', function(asse
 
 	MyType.current = undefined;
 	assert.equal(MyType.current, undefined);
-	promises.push(MyType.currentPromise.catch((msg) => assert.equal(msg, deletedSingletonMessage)));
+	promises.push(MyType.currentPromise.catch((msg) => assert.equal(msg, undefined)));
 
 	Promise.all(promises).then(() => done());
 });

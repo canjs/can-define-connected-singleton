@@ -16,8 +16,6 @@ var defaults = {
 	destroyMethodName: 'destroy',
 };
 
-var deletedSingletonMessage = 'Singleton instance has been destroyed. Save a new instance to reinitialize the singleton.';
-
 function isDefineMapConstructor(Obj) {
 	return Obj && (Obj.prototype instanceof DefineMap);
 }
@@ -35,17 +33,20 @@ function wrapCreateMethod(Ctor, options) {
 		zoneStorage.setItem(options.storageKeys.currentPropertyPromise, ret);
 		Ctor.dispatch(options.currentPropertyPromiseName, [ret]);
 
-		ret.then((instance) => {
-			// clear Ctor.saving, set Ctor.current
-			zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
-			Ctor.dispatch(options.savingPropertyName, [undefined]);
-			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
-			Ctor.dispatch(options.currentPropertyName, [instance]);
-		}).catch(() => {
-			// clear saving
-			zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
-			Ctor.dispatch(options.savingPropertyName, [undefined]);
-		});
+		ret.then(
+			(instance) => {
+				// clear Ctor.saving, set Ctor.current
+				zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
+				Ctor.dispatch(options.savingPropertyName, [undefined]);
+				zoneStorage.setItem(options.storageKeys.currentProperty, instance);
+				Ctor.dispatch(options.currentPropertyName, [instance]);
+			},
+			() => {
+				// clear saving
+				zoneStorage.setItem(options.storageKeys.savingProperty, undefined);
+				Ctor.dispatch(options.savingPropertyName, [undefined]);
+			}
+		);
 
 		return ret;
 	};
@@ -59,7 +60,7 @@ function wrapDestroyMethod(Ctor, options) {
 		var ret = baseDestroy.apply(this, arguments);
 
 		ret.then(() => {
-			var promise = Promise.reject(deletedSingletonMessage);
+			var promise = Promise.reject(undefined);
 
 			// clear current, reject currentPromise w/ reason string if successful
 			zoneStorage.setItem(options.storageKeys.currentProperty, undefined);
@@ -152,7 +153,7 @@ function makeSingleton(Ctor, input_options){
 
 			let promise = instance ?
 				Promise.resolve(instance) :
-				Promise.reject(deletedSingletonMessage);
+				Promise.reject(undefined);
 
 			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
 			Ctor.dispatch(options.currentPropertyName, [instance]);
