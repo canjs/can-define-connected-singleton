@@ -1,6 +1,6 @@
 {
   "name": "can-define-connected-singleton",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Server persisted singleton plugin for can-define",
   "homepage": "https://canjs.com",
   "repository": {
