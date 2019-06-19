@@ -166,7 +166,7 @@ QUnit.test('Destroying sets the "current" property to undefined, with rejected p
 				QUnit.notOk(true, 'should not get here');
 				done();
 			}).catch(function(value) {
-				QUnit.equal(value, undefined);
+				QUnit.propEqual(value, {});
 				done();
 			});
 		});
@@ -201,7 +201,7 @@ QUnit.test('Allows for configurable destroy method name', function(assert){
 				QUnit.notOk(true, 'should not get here');
 				done();
 			}).catch(function(value) {
-				QUnit.equal(value, undefined);
+				QUnit.propEqual(value, {});
 				done();
 			});
 		});
@@ -229,7 +229,7 @@ QUnit.test('Setting .current manually results in expected state.', function(asse
 
 	MyType.current = undefined;
 	assert.equal(MyType.current, undefined);
-	promises.push(MyType.currentPromise.catch((msg) => assert.equal(msg, undefined)));
+	promises.push(MyType.currentPromise.catch((msg) => assert.propEqual(msg, {})));
 
 	Promise.all(promises).then(() => done());
 });

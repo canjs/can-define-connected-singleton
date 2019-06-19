@@ -60,7 +60,7 @@ function wrapDestroyMethod(Ctor, options) {
 		var ret = baseDestroy.apply(this, arguments);
 
 		ret.then(() => {
-			var promise = Promise.reject(undefined);
+			var promise = Promise.reject({});
 
 			// clear current, reject currentPromise w/ reason string if successful
 			zoneStorage.setItem(options.storageKeys.currentProperty, undefined);
@@ -153,7 +153,7 @@ function makeSingleton(Ctor, input_options){
 
 			let promise = instance ?
 				Promise.resolve(instance) :
-				Promise.reject(undefined);
+				Promise.reject({});
 
 			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
 			Ctor.dispatch(options.currentPropertyName, [instance]);
