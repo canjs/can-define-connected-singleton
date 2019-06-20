@@ -59,17 +59,25 @@ function wrapDestroyMethod(Ctor, options) {
 	Ctor.prototype[options.destroyMethodName] = function wrappedDestroy() {
 		var ret = baseDestroy.apply(this, arguments);
 
-		ret.then(() => {
-			var promise = Promise.reject({});
-
-			// clear current, reject currentPromise w/ reason string if successful
+		// return modified promise to ensure that storedPromise check runs before consumer of returned promise
+		return ret.then((value) => {
+			// clear current, reject currentPromise
 			zoneStorage.setItem(options.storageKeys.currentProperty, undefined);
 			Ctor.dispatch(options.currentPropertyName, [undefined]);
-			zoneStorage.setItem(options.storageKeys.currentPropertyPromise, promise);
-			Ctor.dispatch(options.currentPropertyPromiseName, [promise]);
-		});
 
-		return ret;
+			// avoid setting promise a second time if can/session behavior callback handler has already set it to a rejected promise
+			const storedPromise = zoneStorage.getItem(options.storageKeys.currentPropertyPromise);
+			storedPromise.then(
+				() => {
+					var promise = Promise.reject(undefined);
+					zoneStorage.setItem(options.storageKeys.currentPropertyPromise, promise);
+					Ctor.dispatch(options.currentPropertyPromiseName, [promise]);
+				},
+				() => {} // promise is already rejected by can/session destroyedInstance callback
+			);
+
+			return value;
+		});
 	};
 }
 
@@ -153,7 +161,7 @@ function makeSingleton(Ctor, input_options){
 
 			let promise = instance ?
 				Promise.resolve(instance) :
-				Promise.reject({});
+				Promise.reject(undefined);
 
 			zoneStorage.setItem(options.storageKeys.currentProperty, instance);
 			Ctor.dispatch(options.currentPropertyName, [instance]);
