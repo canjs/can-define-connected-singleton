@@ -139,8 +139,8 @@ QUnit.test('Allows for configurable save method name', function(assert){
 });
 
 QUnit.test('Destroying sets the "current" property to undefined, with rejected promise', function(assert){
-	assert.expect(2);
 	var done = assert.async();
+	assert.expect(2);
 	var MyType = singleton(
 		DefineMap.extend({ 
 			get: function() {
@@ -161,21 +161,15 @@ QUnit.test('Destroying sets the "current" property to undefined, with rejected p
 	instance.save().then(() => {
 		instance.destroy().then(() => {
 			assert.equal(MyType.current, undefined);
-
-			MyType.currentPromise.then(function() {
-				assert.notOk(true, 'should not get here');
-				done();
-			}).catch(function(value) {
-				assert.propEqual(value, {});
-				done();
-			});
+			assert.rejects(MyType.currentPromise);
+			done();
 		});
 	});
 });
 
 QUnit.test('Allows for configurable destroy method name', function(assert){
-	assert.expect(2);
 	var done = assert.async();
+	assert.expect(2);
 	var MyType = singleton({ destroyMethodName: 'doFooBar' })(
 		DefineMap.extend({
 			get: function() {
@@ -196,14 +190,8 @@ QUnit.test('Allows for configurable destroy method name', function(assert){
 	instance.save().then(() => {
 		instance.doFooBar().then(() => {
 			assert.equal(MyType.current, undefined);
-
-			MyType.currentPromise.then(function() {
-				assert.notOk(true, 'should not get here');
-				done();
-			}).catch(function(value) {
-				assert.propEqual(value, {});
-				done();
-			});
+			assert.rejects(MyType.currentPromise);
+			done();
 		});
 	});
 });
@@ -229,7 +217,7 @@ QUnit.test('Setting .current manually results in expected state.', function(asse
 
 	MyType.current = undefined;
 	assert.equal(MyType.current, undefined);
-	promises.push(MyType.currentPromise.catch((msg) => assert.propEqual(msg, {})));
+	promises.push(assert.rejects(MyType.currentPromise));
 
 	Promise.all(promises).then(() => done());
 });
